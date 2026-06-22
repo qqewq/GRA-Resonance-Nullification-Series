@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GRA Resonance Nullification Live</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        canvas { max-width: 800px; }
+        .controls { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Alternating Resonance → GRA Nullification</h1>
+    <div class="controls">
+        <label>A: <input id="A" type="number" value="1.0" step="0.1"></label>
+        <label>γ: <input id="gamma" type="number" value="0.1" step="0.01"></label>
+        <label>T (period): <input id="T" type="number" value="2.0" step="0.1"></label>
+        <label>Duration: <input id="duration" type="number" value="10.0" step="1"></label>
+        <button onclick="fetchSimulation()">Simulate</button>
+    </div>
+    <canvas id="chart" width="800" height="400"></canvas>
+    <script>
+        let chart;
+        const ctx = document.getElementById('chart').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    { label: 'Ξ(t)', data: [], borderColor: 'blue', borderWidth: 1, pointRadius: 0 },
+                    { label: 'Moving avg (T)', data: [], borderColor: 'red', borderWidth: 2, pointRadius: 0 }
+                ]
+            },
+            options: { scales: { x: { title: { display: true, text: 'Time' } } } }
+        });
+
+        async function fetchSimulation() {
+            const payload = {
+                A: parseFloat(document.getElementById('A').value),
+                gamma: parseFloat(document.getElementById('gamma').value),
+                T: parseFloat(document.getElementById('T').value),
+                duration: parseFloat(document.getElementById('duration').value)
+            };
+            const resp = await fetch('http://localhost:5000/simulate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await resp.json();
+            chart.data.labels = data.t;
+            chart.data.datasets[0].data = data.Xi;
+            chart.data.datasets[1].data = data.moving_avg.map((v, i) => ({ x: data.t_avg[i], y: v }));
+            chart.update();
+        }
+    </script>
+</body>
+</html>
