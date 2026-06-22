@@ -1,0 +1,15 @@
+{
+  "beam_test_01": {
+    "description": "Подавление резонанса на балке с GRA-ячейкой",
+    "resonance_peak_suppression_db": 20.0,
+    "tolerance_db": 2.0,
+    "energy_reduction_factor": 10.0,
+    "tolerance_factor": 1.5
+  },
+  "latent_toy": {
+    "description": "Снижение LRI в скрытой динамике",
+    "mean_lri_open": 0.65,
+    "mean_lri_closed": 0.05,
+    "tolerance": 0.1
+  }
+}
